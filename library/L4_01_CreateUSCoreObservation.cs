@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace fhirclient_dotnet
 {
@@ -26,7 +27,84 @@ namespace fhirclient_dotnet
         string CodedResultSNOMEDDisplay
         )
         {
-            return "";
+            var patient = FHIR_SearchByIdentifier(ServerEndpoint, PatientIdentifierSystem, PatientIdentifierValue);
+            if (patient == null)
+            {
+                return "Error:Patient_Not_Found";
+            }
+
+            var body = new Dictionary<string, object>
+            {
+                ["resourceType"] = "Observation",
+                ["meta"] = new Dictionary<string, object>
+                {
+                    ["profile"] = new[] { "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab" }
+                },
+                ["status"] = string.IsNullOrWhiteSpace(ObservationStatusCode) ? "final" : ObservationStatusCode,
+                ["category"] = new[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["coding"] = new[]
+                        {
+                            new Dictionary<string, object>
+                            {
+                                ["system"] = "http://terminology.hl7.org/CodeSystem/observation-category",
+                                ["code"] = "laboratory",
+                                ["display"] = "Laboratory"
+                            }
+                        },
+                        ["text"] = "Laboratory"
+                    }
+                },
+                ["code"] = new Dictionary<string, object>
+                {
+                    ["coding"] = new[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["system"] = "http://loinc.org",
+                            ["code"] = ObservationLOINCCode,
+                            ["display"] = ObservationLOINCDisplay
+                        }
+                    },
+                    ["text"] = ObservationLOINCDisplay
+                },
+                ["subject"] = new Dictionary<string, object>
+                {
+                    ["reference"] = "Patient/" + patient.Id
+                },
+                ["effectiveDateTime"] = ObservationDateTime
+            };
+
+            if (string.Equals(ResultType, "numeric", StringComparison.OrdinalIgnoreCase))
+            {
+                body["valueQuantity"] = new Dictionary<string, object>
+                {
+                    ["value"] = decimal.Parse(NumericResultValue, System.Globalization.CultureInfo.InvariantCulture),
+                    ["unit"] = NumericResultUCUMUnit,
+                    ["system"] = "http://unitsofmeasure.org",
+                    ["code"] = NumericResultUCUMUnit
+                };
+            }
+            else
+            {
+                body["valueCodeableConcept"] = new Dictionary<string, object>
+                {
+                    ["coding"] = new[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["system"] = "http://snomed.info/sct",
+                            ["code"] = CodedResultSNOMEDCode,
+                            ["display"] = CodedResultSNOMEDDisplay
+                        }
+                    },
+                    ["text"] = CodedResultSNOMEDDisplay
+                };
+            }
+
+            return JsonSerializer.Serialize(body, new JsonSerializerOptions { WriteIndented = false });
         }
     
       

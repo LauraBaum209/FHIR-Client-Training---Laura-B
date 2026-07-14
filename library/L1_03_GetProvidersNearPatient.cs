@@ -12,7 +12,22 @@ namespace fhirclient_dotnet
          string IdentifierValue
          )
          {
-            return "";
+            Hl7.Fhir.Model.Patient patient = FHIR_SearchByIdentifier(ServerEndPoint, IdentifierSystem, IdentifierValue);
+            if (patient == null)
+            {
+                return "Error:Patient_Not_Found";
+            }
+
+            string city = patient.Address != null && patient.Address.Count > 0
+                ? patient.Address[0].City
+                : null;
+
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                return "Error:Patient_w/o_City";
+            }
+
+            return GetProvidersByCity(ServerEndPoint, city);
          }
     
      private string GetProvidersByCity(string server,string city)

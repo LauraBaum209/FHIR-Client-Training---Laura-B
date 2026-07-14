@@ -16,7 +16,26 @@ namespace fhirclient_dotnet
          string myBirthDate
          )
          {
-            return "";
+            Hl7.Fhir.Model.Patient patient = FHIR_SearchByIdentifier(ServerEndPoint, IdentifierSystem, IdentifierValue);
+            if (patient == null)
+            {
+                return "Error:Patient_Not_Found";
+            }
+
+            string serverFamily = GetFamily(patient);
+            string serverGiven = GetGiven(patient);
+            string serverGender = GetGender(patient);
+            string serverBirthDate = GetBirthDate(patient);
+
+            string CompareValue(string expected, string actual)
+            {
+                return string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase) ? "{green}" : "{red}";
+            }
+
+            return "{family}|" + myFamily + "|" + serverFamily + "|" + CompareValue(myFamily, serverFamily) + "\n"
+                 + "{given}|" + myGiven + "|" + serverGiven + "|" + CompareValue(myGiven, serverGiven) + "\n"
+                 + "{gender}|" + myGender.ToUpperInvariant() + "|" + serverGender.ToUpperInvariant() + "|" + CompareValue(myGender, serverGender) + "\n"
+                 + "{birthDate}|" + myBirthDate + "|" + serverBirthDate + "|" + CompareValue(myBirthDate, serverBirthDate) + "\n";
          }
     
 

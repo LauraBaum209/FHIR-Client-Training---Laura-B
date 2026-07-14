@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("fhirclient_dotnet")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1083bf1c437970dd73bd229adae50d8107bd835c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f71c93ae0085bb610442d4bcbc73909e5747184")]
 [assembly: System.Reflection.AssemblyProductAttribute("fhirclient_dotnet")]
 [assembly: System.Reflection.AssemblyTitleAttribute("fhirclient_dotnet")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
